@@ -1,7 +1,7 @@
 class Solution {
 public:
     map<int, int> mp;
-    vector<int> vec1;
+    vector<int> res;
     int c=1;
     vector<int> twoSum(vector<int>& nums, int target) {
         if(nums.size()>1){
@@ -11,11 +11,11 @@ public:
            if(mp.find(target-*it) == mp.end()){
                mp[*it] = c; 
            } else {
-               vec1.push_back(mp[target-*it]);
-               vec1.push_back(c);
+               res.push_back(mp[target-*it]);
+               res.push_back(c);
            }
             c++;
         }
-        return vec1;
+        return res;
     }
 };
