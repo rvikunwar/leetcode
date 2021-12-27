@@ -43,3 +43,46 @@ public:
     }
     }
 };
+
+//solution 2 (sliding window protocol)
+
+class Solution {
+public:
+    int minOperations(vector<int>& nums, int x) {
+        int total = 0;
+        for(auto it:nums) total += it;
+        
+        int j=0;
+        int target = total-x;
+        int steps = INT_MIN;
+        
+        if(target<0){
+            return -1;
+        }
+        
+        for(int i=0; i<nums.size(); i++){
+            while(target > 0 && j < nums.size()){
+                if(nums[j] <= target){
+                    target = target - nums[j];
+                    j++;
+                } else {
+                    break;
+                }
+            }
+            
+            if(target == 0){
+                steps = max(j-i , steps);
+                target = target + nums[i];
+            } else if(target != 0 && j != nums.size()){
+                target = target + nums[i];
+            } else if(steps == INT_MIN && j == nums.size()){
+                return -1;
+            } else if( j == nums.size()){
+               return nums.size()-steps; 
+            }
+            
+                
+        }
+        return nums.size()-steps;
+    }
+};
