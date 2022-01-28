@@ -1,0 +1,28 @@
+class Solution {
+public:
+    int INF = pow(10, 5);
+
+    int findCheapestPrice(int n, vector<vector<int>>& flights, int src, int dst, int k) {
+        vector<int> dist (n, INF);
+        dist[src] = 0;
+        
+        for(int iter=0; iter <= k; iter++){
+            vector<int> vc(dist);
+            for(auto it: flights){
+                if(dist[it[0]] + it[2] < vc[it[1]]){
+                    vc[it[1]] = dist[it[0]] + it[2];
+                }
+            }
+            dist = vc;
+        }
+        
+                                                     
+        if(dist[dst] != INF){
+            return dist[dst];
+        } else {
+            return -1;
+        }
+    }
+    
+   
+};
