@@ -1,0 +1,31 @@
+class Solution {
+public:
+    bool validPath(int n, vector<vector<int>>& edges, int source, int destination) {
+        vector<vector<int>> li(n);
+        vector<int> vis(n, -1);
+        
+        for(auto it: edges){
+            li[it[0]].push_back(it[1]);
+            li[it[1]].push_back(it[0]);
+        }
+        vis[source] =1;
+        check(li[source], vis, li);
+            
+        if(vis[destination] ==1){
+            return true;
+        } 
+        return false;
+
+    }
+                  
+    void check(vector<int>& edge, vector<int> &vis, vector<vector<int>> &li){
+        for(auto i : edge){
+            if(vis[i] == 1){
+                continue;
+            } else {
+                vis[i] = 1;
+                check(li[i], vis, li);
+            }
+        }
+    }
+};

@@ -1,0 +1,28 @@
+class Solution {
+public:
+    vector<vector<int>> allPathsSourceTarget(vector<vector<int>>& graph) {
+        vector<vector<int>> path;
+        int n =graph.size();
+        
+        vector<int> p;
+        paths(graph[0],p ,0, n, graph, path);
+
+        return path;
+
+    }
+    
+    void paths(vector<int> vc, vector<int> &p, int k, int n, vector<vector<int>> graph, vector<vector<int>> &path){
+        p.push_back(k);
+        if( k == n-1){
+            path.push_back(p);
+            p.pop_back();
+            return;
+        }
+        for(auto i: graph[k]){
+            paths(graph[i], p, i, n, graph, path);
+        }
+        
+        p.pop_back();
+        
+    }
+};

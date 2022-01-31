@@ -1,0 +1,29 @@
+class Solution {
+public:
+    bool canVisitAllRooms(vector<vector<int>>& rooms) {
+        vector<int> visited(rooms.size(), -1);
+        visitRoom(rooms, visited, 0);
+        
+        for(auto i: visited){
+            if(i == -1){
+                return false;
+            }
+        }
+        return true;
+        
+    }
+    
+    void visitRoom(vector<vector<int>>& rooms, vector<int> &visited, int r){
+        
+        if(visited[r] == 1){
+            return;
+        }
+        visited[r] = 1;
+        if(rooms[r].empty()){
+            return;
+        }
+        for(auto it: rooms[r]){
+            visitRoom(rooms, visited, it);
+        }
+    }
+};
