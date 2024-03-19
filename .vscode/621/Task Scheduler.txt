@@ -1,0 +1,57 @@
+You are given an array of CPU tasks, each represented by letters A to Z, and a cooling time, n. Each cycle or interval allows the completion of one task. Tasks can be completed in any order, but there's a constraint: identical tasks must be separated by at least n intervals due to cooling time.
+
+​Return the minimum number of intervals required to complete all tasks.
+
+class Solution {
+public:
+
+    void check(vector<int> &vc, string &str, int i, int j, int &count) {
+        bool flag = true;
+        for(int z=0; z<26; z++){
+            flag = true;
+            if(vc[z] > 0){
+                
+                for(int k=i; k<j; k++){
+                    if(str[k] == (z + 'A')){
+                        flag = false;
+                        break;
+                    }
+                }
+
+                if(flag == true){
+                    str += (z + 'A');
+                    vc[z]--;
+                    count--;
+                    break;
+                }
+            } else {
+                flag = false;
+            }
+        }
+
+        if(flag == false){
+            str += '1';
+        }
+    }
+    int leastInterval(vector<char>& tasks, int n) {
+        vector<int> vc(26, 0);
+        int size = tasks.size();
+        for(int i=0; i<size; i++){
+            vc[tasks[i] - 'A']++;
+        }
+
+        sort(vc.begin(), vc.end());
+        int chunk = vc[25];
+        int id = chunk * n;
+
+        int count = 0;
+        for(int i= 24; i>=0; i--){
+            if(vc[i] == chunk){
+                count++;
+            }
+            id -= vc[i];
+        } 
+
+        return id - (n - count) < 0 ? size: size + (id - (n - count));
+    }
+};
