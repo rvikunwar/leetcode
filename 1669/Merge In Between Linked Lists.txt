@@ -1,0 +1,53 @@
+You are given two linked lists: list1 and list2 of sizes n and m respectively.
+
+Remove list1's nodes from the ath node to the bth node, and put list2 in their place.
+
+The blue edges and nodes in the following figure indicate the result:
+
+
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode() : val(0), next(nullptr) {}
+ *     ListNode(int x) : val(x), next(nullptr) {}
+ *     ListNode(int x, ListNode *next) : val(x), next(next) {}
+ * };
+ */
+class Solution {
+public:
+    ListNode* mergeInBetween(ListNode* list1, int a, int b, ListNode* list2) {
+        ListNode* dummy = new ListNode(0);
+        dummy->next = list1;
+
+        ListNode* end2 = list2;
+
+        while(end2->next != nullptr){
+            end2 = end2->next;
+        }
+
+        ListNode* start = list1;
+        ListNode* end = list1;
+        int count = 0;
+
+        while(count <= (a-1)){
+            if(count == (a-1)){
+                end = start->next;
+                start->next = list2;
+            }
+            start = start->next;
+            count++;
+        }
+
+        while(count <= (b+1)){
+            if(count == b+1){
+                end2->next = end;
+            }
+            end = end->next;
+            count++;
+        }
+
+        return dummy->next;
+    }
+};
