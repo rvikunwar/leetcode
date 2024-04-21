@@ -1,0 +1,35 @@
+You are given a 2D matrix grid of size m x n. In one operation, you can change the value of any cell to any non-negative number. You need to perform some operations such that each cell grid[i][j] is:
+
+Equal to the cell below it, i.e. grid[i][j] == grid[i + 1][j] (if it exists).
+Different from the cell to its right, i.e. grid[i][j] != grid[i][j + 1] (if it exists).
+Return the minimum number of operations needed.
+
+
+class Solution {
+public:
+    
+    int f(int index, int last, vector<vector<int>>& grid, int m, int n, vector<vector<int>> &dp) {
+        if(index == n) return 0;
+        if(dp[index][last+1] != -1) return dp[index][last+1];
+        int ans = INT_MAX;
+        for(int i=0; i<=9; i++){
+            if(last == i) continue;
+            int count = 0;
+            for(int j=0; j<m; j++){
+                if(grid[j][index] != i){
+                    count++;
+                }
+            }
+            ans = min(ans, count + f(index+1, i, grid, m, n, dp));
+        }
+        
+        return dp[index][last+1] = ans;
+    }
+    
+    int minimumOperations(vector<vector<int>>& grid) {
+        int m = grid.size();
+        int n = grid[0].size();
+        vector<vector<int>> dp(n, vector<int> (11, -1));
+        return f(0, -1, grid, m, n, dp);
+    }
+};
