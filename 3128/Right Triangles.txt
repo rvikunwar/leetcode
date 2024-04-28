@@ -1,0 +1,38 @@
+You are given a 2D boolean matrix grid.
+
+Return an integer that is the number of right triangles that can be made with the 3 elements of grid such that all of them have a value of 1.
+
+Note:
+
+A collection of 3 elements of grid is a right triangle if one of its elements is in the same row with another element and in the same column with the third element. The 3 elements do not have to be next to each other.
+
+
+class Solution {
+public:
+    long long numberOfRightTriangles(vector<vector<int>>& grid) {
+        int m = grid.size();
+        int n = grid[0].size();
+        vector<int> row(m, 0);
+        vector<int> col(n, 0);
+        
+        for(int i=0; i<m; i++){ 
+            for(int j=0; j<n; j++){
+                if(grid[i][j] == 1){
+                    row[i]++;
+                    col[j]++;
+                }
+            }   
+        }
+        
+        long long ans = 0;
+        for(int i=0; i<m; i++){ 
+            for(int j=0; j<n; j++){
+                if(grid[i][j] == 1){
+                    ans += ((row[i]-1) * (col[j]-1));
+                }
+            }   
+        }
+        
+        return ans;
+    }
+};
