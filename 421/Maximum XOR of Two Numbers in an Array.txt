@@ -1,0 +1,127 @@
+Given an integer array nums, return the maximum result of nums[i] XOR nums[j], where 0 <= i <= j < n.
+
+Example 1:
+
+Input: nums = [3,10,5,25,2,8]
+Output: 28
+Explanation: The maximum result is 5 XOR 25 = 28.
+Example 2:
+
+Input: nums = [14,70,53,83,49,91,36,80,92,51,66,70]
+Output: 127
+
+
+class Trie {
+    public:
+        struct TrieNode {
+            vector<TrieNode*> links;
+            bool isLast = false;
+            TrieNode () {
+                links.resize(2);
+            }
+
+            bool isContains(int val) {
+                return links[val] != nullptr;
+            }
+
+            TrieNode* next(int val){
+                return links[val];
+            }
+            
+            void put(int val){
+                links[val] = new TrieNode();
+            }
+        };
+
+        TrieNode* root;
+        Trie () {
+            root = new TrieNode();
+        }
+
+        void insert(string str) {
+            TrieNode* node = root;
+            for(int i=0; i<str.size(); i++){
+                if(!node->isContains(str[i]-'0')){
+                    node->put(str[i]-'0');
+                }
+                node = node->next(str[i]-'0');
+            }
+            node->isLast = true;
+        }
+
+        void find(string &str){
+            TrieNode* node = root;
+            for(int i=0; i<str.size(); i++){
+                int val = str[i] - '0';
+                if(node->isContains(val)){
+                    node = node->next(val);
+                } else {
+                    char ch = '0' + (!val);
+                    str[i] = ch;
+                    node = node->next(!val);   
+                }
+            }
+        }
+};
+
+class Solution {
+public:
+    string reverseBits(string str) {
+        string revStr = "";
+        for(int i=0; i<str.size(); i++){
+            if(str[i] == '0'){
+                revStr += '1';
+            } else {
+                revStr += '0';      
+            }
+        }
+        return revStr;
+    }
+
+    string getBits(int value, int maxBitSize) {
+        string str = "";
+        for(int i=maxBitSize-1; i>=0; i--){
+            if(value & 1<<i) {
+                str += '1';
+            } else {
+                str += '0';
+            }
+        }
+        return str;
+    }
+
+    int findMaximumXOR(vector<int>& nums) {
+        Trie* trie = new Trie();
+        int maxi = 0;
+        for(auto it: nums){
+            maxi = max(maxi, it);
+        }
+        if (maxi == 0) {
+            return 0;
+        }
+        int maxBitSize = log2(maxi) + 1;
+
+        for(auto it: nums){
+            string s = getBits(it, maxBitSize);
+            trie->insert(s);
+        }
+
+        int ans = 0;
+        for(auto it: nums){
+            string bits = getBits(it, maxBitSize);
+            string s = reverseBits(bits);
+            trie->find(s);
+            int size = s.size()-1;
+            int val = 0;
+            for(int i=size; i>=0; i--){
+                val += ((s[i]- '0') * (1<<(size-i)));
+            }
+
+            auto xor_ = it^val;
+
+            ans = max(ans, xor_);
+        }
+        
+        return ans;
+    }
+};
