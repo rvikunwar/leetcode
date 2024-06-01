@@ -1,0 +1,59 @@
+You are in a city that consists of n intersections numbered from 0 to n - 1 with bi-directional roads between some intersections. The inputs are generated such that you can reach any intersection from any other intersection and that there is at most one road between any two intersections.
+
+You are given an integer n and a 2D integer array roads where roads[i] = [ui, vi, timei] means that there is a road between intersections ui and vi that takes timei minutes to travel. You want to know in how many ways you can travel from intersection 0 to intersection n - 1 in the shortest amount of time.
+
+Return the number of ways you can arrive at your destination in the shortest amount of time. Since the answer may be large, return it modulo 109 + 7.
+
+class Solution {
+public:
+    unordered_map<int, vector<pair<int, int>>> graph;
+    vector<long long> dist;
+    vector<int> ways;
+    int mod = 1e9 + 7;
+    long long maxi = LLONG_MAX;
+
+    void dijsktra() {
+        priority_queue<pair<long long, int>, vector<pair<long long, int>>, greater<pair<long long, int>>> pq;
+        pq.push({0, 0});
+        dist[0] = 0;
+        ways[0] = 1;
+
+        while(!pq.empty()) {
+            pair<long long, int> pr = pq.top();
+            long long t = pr.first;
+            int u = pr.second;
+            pq.pop();
+
+            if(t > dist[u]) continue;
+
+            for(auto it: graph[u]) {
+                int v = it.first;
+                if(v == u) continue;
+                int newTime = it.second;
+                if(newTime + t < dist[v]) {
+                    ways[v] = ways[u];
+                    dist[v] = newTime + t;
+                    pq.push({dist[v], v});
+                }
+                else if(newTime + t == dist[v]) {
+                    ways[v] = (ways[v] + ways[u]) % mod;
+                }
+            }
+        }
+    }
+
+    int countPaths(int n, vector<vector<int>>& roads) {
+        ways.resize(n);
+        dist.resize(n, maxi); 
+
+        for(int i=0; i<roads.size(); i++) {
+            int u = roads[i][0];
+            int v = roads[i][1];
+            int time = roads[i][2];
+            graph[u].push_back({v, time});
+            graph[v].push_back({u, time});
+        }
+        dijsktra();
+        return ways[n-1];
+    }
+};
