@@ -1,0 +1,70 @@
+You are given an array nums and an integer k. You need to find a 
+subarray
+ of nums such that the absolute difference between k and the bitwise AND of the subarray elements is as small as possible. In other words, select a subarray nums[l..r] such that |k - (nums[l] AND nums[l + 1] ... AND nums[r])| is minimum.
+
+Return the minimum possible value of the absolute difference.
+
+A subarray is a contiguous non-empty sequence of elements within an array.
+
+class Solution {
+public:
+    vector<int> bits;
+    void add_bits(int value){ 
+        for(int i=0; i<32; i++){
+            if(1<<i & value){
+                bits[31-i]++;
+            }
+        }
+    }
+
+    void remove_bits(int value){ 
+        for(int i=0; i<32; i++){
+            if(1<<i & value){
+                bits[31-i]--;
+            }
+        }
+    }
+
+    int bits_to_decimal(int length) {
+        int value = 0;
+        for(int i=0; i<32; i++){
+            if(bits[31-i] == length){
+                value += (1 << i);
+            }
+        }
+        return value;
+    }
+
+    int minimumDifference(vector<int>& nums, int k) {
+        int diff;
+        int ans = INT_MAX;
+        int i=0, j=0;
+        bits.resize(32);
+        int n = nums.size();
+        add_bits(nums[i]);
+        
+        int and_;
+
+        while(j < n) {
+            and_ = bits_to_decimal(j-i+1);
+            ans = min(ans, abs(k - and_));
+            if(and_ >= k) {
+                j++;
+                if(j<n) {
+                    add_bits(nums[j]);
+                }
+            } else {
+                remove_bits(nums[i]);
+                i++;
+                if(i>j) {
+                    j = i;
+                    if(j<n) { 
+                        add_bits(nums[j]);
+                    }
+                }
+            }
+        }
+
+        return ans;
+    }
+};
