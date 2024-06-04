@@ -1,0 +1,62 @@
+There is an undirected graph of n nodes. You are given a 2D array edges, where edges[i] = [ui, vi, lengthi] describes an edge between node ui and node vi with a traversal time of lengthi units.
+
+Additionally, you are given an array disappear, where disappear[i] denotes the time when the node i disappears from the graph and you won't be able to visit it.
+
+Notice that the graph might be disconnected and might contain multiple edges.
+
+Return the array answer, with answer[i] denoting the minimum units of time required to reach node i from node 0. If node i is unreachable from node 0 then answer[i] is -1.
+
+
+class Solution {
+public:
+
+    unordered_map<int, vector<pair<int, int>>> graph;
+    vector<int> dist;
+
+    void dijsktra(vector<int>& disappear) {
+        
+        priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>> pq;
+        pq.push({0, 0});
+        dist[0] = 0;
+
+        while(!pq.empty()) {
+            pair<int, int> pr = pq.top();
+            pq.pop();
+            int u = pr.second;
+            int t = pr.first;
+            if(t>dist[u]) continue;
+            vector<pair<int, int>> edges = graph[u];
+
+            for(int i=0; i<edges.size(); i++) {
+                int v = edges[i].first;
+                int _t = t + edges[i].second;
+                if(_t < disappear[v] && _t < dist[v]) {
+                    pq.push({ _t, v});
+                    dist[v] = _t;
+                }
+            }
+        }
+    }
+
+    vector<int> minimumTime(int n, vector<vector<int>>& edges, vector<int>& disappear) {
+        dist.resize(n, INT_MAX);
+
+        for(int i=0; i<edges.size(); i++){
+            int u = edges[i][0]; 
+            int v = edges[i][1]; 
+            int t = edges[i][2]; 
+            graph[u].push_back({v, t});
+            graph[v].push_back({u, t});
+        }
+
+        dijsktra(disappear);
+
+        for(int i=0; i<n; i++){
+            if(dist[i] == INT_MAX) {
+                dist[i] = -1;
+            }
+        }
+
+        return dist;
+    }
+};
