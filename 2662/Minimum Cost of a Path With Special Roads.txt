@@ -1,0 +1,75 @@
+You are given an array start where start = [startX, startY] represents your initial 
+position (startX, startY) in a 2D space. You are also given the array target where 
+target = [targetX, targetY] represents your target position (targetX, targetY).
+
+The cost of going from a position (x1, y1) to any other position in the space 
+(x2, y2) is |x2 - x1| + |y2 - y1|.
+
+There are also some special roads. You are given a 2D array specialRoads 
+where specialRoads[i] = [x1i, y1i, x2i, y2i, costi] indicates that the 
+ith special road can take you from (x1i, y1i) to (x2i, y2i) with a cost 
+equal to costi. You can use each special road any number of times.
+
+Return the minimum cost required to go from (startX, startY) to (targetX, targetY).
+
+
+class Solution {
+public:
+    map<pair<int, int>, vector<pair<int, pair<int, int>>> > graph;
+    map<pair<int, int>, int> dist;
+    priority_queue<pair<int, pair<int, int>>, vector<pair<int, pair<int, int>>>, greater<pair<int, pair<int, int>>>> pq;
+
+    int minimumCost(vector<int>& start, vector<int>& target, vector<vector<int>>& specialRoads) {
+        int size = specialRoads.size();
+        pair<int, int> s = {start[0], start[1]};
+        pair<int, int> e = {target[0], target[1]};
+        int main_cost = abs(e.second - s.second) + abs(e.first - s.first);
+        graph[s].push_back({ main_cost, e });
+        // cout<<main_cost<<endl;
+        dist[s] = INT_MAX;
+        dist[e] = INT_MAX;
+
+        for(int i=0; i<size; i++) {
+            pair<int, int> start = {specialRoads[i][0], specialRoads[i][1]};
+            pair<int, int> end = {specialRoads[i][2], specialRoads[i][3]};
+            int cost = specialRoads[i][4];
+            int cost_to_start = abs(start.second - s.second) + abs(start.first - s.first);
+            int cost_to_end = abs(e.second - end.second) + abs(e.first - end.first);
+            graph[s].push_back({cost_to_start, start});
+            dist[s] = INT_MAX;
+            graph[end].push_back({cost_to_end, e});
+            dist[end] = INT_MAX;
+            graph[start].push_back({cost, end});
+            dist[start] = INT_MAX;
+
+            for(int j=0; j<size; j++) {
+                if(j==i) continue;
+                pair<int, int> other_start = {specialRoads[j][0], specialRoads[j][1]};
+                int other_cost_to_start = abs(end.second - other_start.second) + abs(end.first - other_start.first);
+                graph[end].push_back({other_cost_to_start, other_start});
+                dist[end] = INT_MAX;
+            }
+        }
+
+        pq.push({ 0, s });
+        dist[s] = 0;
+
+        while(!pq.empty()){
+            pair<int, pair<int, int>> top = pq.top();
+            pq.pop();
+            int cost = top.first;
+            pair<int, int> node = top.second;
+            vector<pair<int, pair<int, int>>> edges = graph[node];
+            // if(cost > dist[node]) continue;
+            for(auto it: edges) {
+                if(it.first + cost < dist[it.second]) {
+                    dist[it.second] = it.first + cost;
+                    // cout<<dist[it.second]<<endl;
+                    pq.push({dist[it.second], it.second});
+                }
+            }
+        }
+
+        return dist[e];
+    }
+};
