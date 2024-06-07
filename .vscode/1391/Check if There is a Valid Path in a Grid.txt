@@ -1,0 +1,108 @@
+You are given an m x n grid. Each cell of grid represents a street. 
+The street of grid[i][j] can be:
+
+1 which means a street connecting the left cell and the right cell.
+2 which means a street connecting the upper cell and the lower cell.
+3 which means a street connecting the left cell and the lower cell.
+4 which means a street connecting the right cell and the lower cell.
+5 which means a street connecting the left cell and the upper cell.
+6 which means a street connecting the right cell and the upper cell.
+
+class DSU {
+    public:
+        vector<int> parent;
+        vector<int> rank;
+
+        DSU(int n) {
+            parent.resize(n);
+            rank.resize(n);
+
+            for(int i=0; i<n; i++){
+                parent[i] = i;
+            }
+        }
+
+        int find_parent(int u) {
+            if(u != parent[u]) {
+                parent[u] = find_parent(parent[u]);
+            }
+
+            return parent[u];
+        }
+
+        void union_set(int u, int v) {
+            int root_u = find_parent(u);
+            int root_v = find_parent(v);
+            if(rank[root_u] > rank[root_v]) {
+                parent[root_v] = root_u;
+            } else if(rank[root_u] < rank[root_v]) {
+                parent[root_u] = root_v;
+            } else {
+                parent[root_u] = root_v;
+                rank[root_v]++;
+            }
+        }
+};
+
+class Solution {
+public:
+    unordered_map<int, vector<vector<int>>> dir;
+    bool hasValidPath(vector<vector<int>>& grid) {
+
+        dir[1] = {{0, -1}, {0, 1}};
+        dir[2] = {{1, 0}, {-1, 0}};
+        dir[3] = {{0, -1}, {1, 0}};
+        dir[4] = {{0, 1}, {1, 0}};
+        dir[5] = {{0, -1}, {-1, 0}};
+        dir[6] = {{-1, 0}, {0, 1}};
+
+
+        int n = grid.size();
+        int m = grid[0].size();
+
+        DSU dis(n*m);
+
+        vector<vector<int>> vc(n*m);
+        for(int i=0; i<n; i++) {
+            for(int j=0; j<m; j++) {
+                int value = grid[i][j];
+                vector<vector<int>> directions = dir[value];
+                int cur_grid_index = i*m + j;
+                for(int k =0; k<2; k++) {
+                    int new_row = i + directions[k][0];
+                    int new_col = j + directions[k][1];
+                    int adj_grid_index = new_row*m + new_col;
+                    vc[cur_grid_index].push_back(adj_grid_index);
+                }
+            }
+        }
+
+        for(int i=0; i<n; i++) {
+            for(int j=0; j<m; j++) {
+                int value = grid[i][j];
+                vector<vector<int>> directions = dir[value];
+                int cur_grid_index = i*m + j;
+                for(int k =0; k<2; k++) {
+                    int new_row = i + directions[k][0];
+                    int new_col = j + directions[k][1];
+
+                    if(new_row >= 0 && new_col >= 0 && new_row < n && new_col < m) {
+                        int new_grid_index = new_row*m + new_col;
+                        for(int l=0; l<vc[new_grid_index].size(); l++) {
+                            if(vc[new_grid_index][l] == cur_grid_index) {
+                                dis.union_set(new_grid_index, cur_grid_index);
+                                break;
+                            }
+                        }
+                        
+                    }
+                }
+            } 
+        }
+        
+        if(dis.find_parent(0) == dis.find_parent(n*m-1)) {
+            return true;
+        }
+        return false;
+    }
+};
