@@ -1,0 +1,42 @@
+Given an integer array nums and an integer k, return true 
+if nums has a good subarray or false otherwise.
+
+A good subarray is a subarray where:
+
+its length is at least two, and
+the sum of the elements of the subarray is a multiple of k.
+Note that:
+
+A subarray is a contiguous part of the array.
+An integer x is a multiple of k if there exists an 
+integer n such that x = n * k. 0 is always a multiple of k.
+
+class Solution {
+public:
+    bool checkSubarraySum(vector<int>& nums, int k) {
+        bool ans = false;
+        int size = nums.size();
+        vector<int> pre(size, 0);
+        pre[0] = nums[0];
+        int j = 1;
+        
+        unordered_map<int, int> mp;
+        mp[nums[0]%k] = 0;
+        mp[0] = -1;
+        while(j < size) {
+            pre[j] = pre[j-1] + nums[j];
+            int rem = (pre[j] % k);
+            if(mp.find(rem) != mp.end())  {    
+                if(j - mp[rem] >= 2) {
+                    ans = true;
+                    break;
+                }
+            } else {
+                mp[rem] = j;
+            }
+            
+            j++;
+        }
+        return ans;
+    }
+};
