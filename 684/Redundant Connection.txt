@@ -1,0 +1,69 @@
+In this problem, a tree is an undirected graph that is 
+connected and has no cycles.
+
+You are given a graph that started as a tree with n nodes 
+labeled from 1 to n, with one additional edge added. 
+The added edge has two different vertices chosen from 
+1 to n, and was not an edge that already existed. 
+The graph is represented as an array edges of 
+length n where edges[i] = [ai, bi] indicates that there 
+is an edge between nodes ai and bi in the graph.
+
+Return an edge that can be removed so that the 
+resulting graph is a tree of n nodes. If there are 
+multiple answers, return the answer that occurs 
+last in the input.
+
+
+class DSU {
+    public:
+        vector<int> parent;
+        vector<int> rank;
+        DSU(int n) {
+            parent.resize(n+1);
+            rank.resize(n+1);
+
+            for(int i=0; i<n; i++) {
+                parent[i] = i;
+            }
+        }
+
+        int find(int u) {
+            if(parent[u] != u){
+                parent[u] = find(parent[u]);
+            }
+            return parent[u];
+        }
+
+        void union_set_(int u, int v) {
+            int root_u = find(u);
+            int root_v = find(v);
+
+            if(rank[root_u] > rank[root_v]) {
+                parent[root_v] = root_u;
+            } else if(rank[root_u] < rank[root_v]) {
+                parent[root_u] = root_v;
+            } else {
+                parent[root_v] = root_u;
+                rank[root_u]++;
+            }
+        }
+};
+
+class Solution {
+public:
+    vector<int> findRedundantConnection(vector<vector<int>>& edges) {
+        int size = edges.size();
+        DSU dsu(size);
+        vector<int> ans;
+        for(auto it: edges) {
+            if(dsu.find(it[0]) == dsu.find(it[1])) {
+                ans = it;
+                break;
+            } else {
+                dsu.union_set_(it[0], it[1]);
+            }
+        }
+        return ans;
+    }
+};
