@@ -1,0 +1,69 @@
+Given an unsorted array of integers nums, 
+return the length of the longest consecutive elements sequence.
+
+You must write an algorithm that runs in O(n) time.
+
+
+class DSU {
+    public:
+        unordered_map<int, int> parent;
+        unordered_map<int, int> rank;
+
+        DSU(vector<int> &vc) {
+            for(int i=0; i<vc.size(); i++){
+                parent[vc[i]] = vc[i];
+                rank[vc[i]] = 0;
+            }
+        }
+
+        int find(int u) {
+            if(parent[u] != u){
+                parent[u] = find(parent[u]);
+            }
+
+            return parent[u];
+        }
+
+        void union_set_(int u, int v) {
+            int root_u = find(u);
+            int root_v = find(v);
+
+            if(rank[root_u] > rank[root_v]) {
+                parent[root_v] = root_u;
+            }
+            else if(rank[root_u] < rank[root_v]) {
+                parent[root_u] = root_v;
+            } 
+            else {
+                parent[root_u] = root_v;
+                rank[root_v]++;
+            }
+        }
+};
+
+class Solution {
+public:
+
+    int longestConsecutive(vector<int>& nums) {
+        DSU dsu(nums);
+
+        for(int i=0; i<nums.size(); i++) {
+            if(dsu.parent.find(nums[i] - 1) != dsu.parent.end()) {
+                dsu.union_set_(nums[i] - 1, nums[i]);
+            }
+        }
+
+        int ans = 0;
+        unordered_map<int, int> traversed;
+        unordered_map<int,int> ans_count;
+        for(int i=0; i<nums.size(); i++) { 
+            if(traversed.find(nums[i]) != traversed.end()) continue;
+            traversed[nums[i]] = 1;
+            int parent_ = dsu.find(nums[i]);
+            ans_count[parent_]++;
+            ans = max(ans, ans_count[parent_ ]);
+        }
+
+        return ans;
+    }
+};
