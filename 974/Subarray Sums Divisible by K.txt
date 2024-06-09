@@ -1,0 +1,28 @@
+Given an integer array nums and an integer k, 
+return the number of non-empty subarrays 
+that have a sum divisible by k.
+
+A subarray is a contiguous part of an array.
+
+class Solution {
+public:
+    int subarraysDivByK(vector<int>& nums, int k) {
+
+        int sum = 0;
+        int i=0;
+        int n = nums.size();
+        unordered_map<int , int> mp;
+        mp[0] = 1;
+        int ans = 0;
+        while(i<n) {
+            sum += nums[i];
+            int mod = (sum%k + k)%k;
+            if(mp.find(mod) != mp.end()) {
+                ans += mp[mod];
+            } 
+            mp[mod]++;
+            i++;
+        }
+        return ans;
+    }   
+};
