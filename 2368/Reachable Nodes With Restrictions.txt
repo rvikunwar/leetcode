@@ -1,0 +1,79 @@
+There is an undirected tree with n nodes labeled 
+from 0 to n - 1 and n - 1 edges.
+
+You are given a 2D integer array edges of 
+length n - 1 where edges[i] = [ai, bi] 
+indicates that there is an edge between nodes ai 
+and bi in the tree. You are also given an integer 
+array restricted which represents restricted nodes.
+
+Return the maximum number of nodes you can reach 
+from node 0 without visiting a restricted node.
+
+Note that node 0 will not be a restricted node.
+
+
+class DSU {
+    public:
+        vector<int> parent;
+        vector<int> rank;
+        DSU(int n) {
+            parent.resize(n);
+            rank.resize(n);
+
+            for(int i=0; i<n; i++){
+                parent[i] = i;
+            }
+        }
+
+        int find(int u) {
+            if(parent[u] != u){
+                parent[u] = find(parent[u]);
+            }
+
+            return parent[u];
+        } 
+
+        void union_(int u, int v){
+            int root_u = find(u);
+            int root_v = find(v);
+
+            if(rank[root_u] > rank[root_v]) {
+                parent[root_v] = root_u;
+            } else if(rank[root_u] < rank[root_v]) {
+                parent[root_u] = root_v;
+            } else {
+                parent[root_u] = root_v;
+                rank[root_u]++;
+            }
+        }
+};
+
+class Solution {
+public:
+    int reachableNodes(int n, vector<vector<int>>& edges, vector<int>& restricted) {
+        unordered_map<int, int> mp;
+
+        for(int i =0; i < restricted.size(); i++) {
+            mp[restricted[i]] = 1;
+        }
+
+        DSU dsu(n);
+        for(int i=0; i<edges.size(); i++) {
+            if(!mp[edges[i][0]] && !mp[edges[i][1]]) {
+                dsu.union_(edges[i][0], edges[i][1]);
+            }
+        }
+
+        int parent_0 = dsu.find(0);
+
+        int ans = 0;
+        for(int i=0; i<n; i++) {
+            if(parent_0 == dsu.find(i)) {
+                ans++;
+            }
+        }
+
+        return ans;
+    }
+};
