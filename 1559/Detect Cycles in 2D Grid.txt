@@ -1,0 +1,65 @@
+Given a 2D array of characters grid of size m x n, you need to find if 
+there exists any cycle consisting of the same value in grid.
+
+A cycle is a path of length 4 or more in the grid that 
+starts and ends at the same cell. From a given cell, 
+you can move to one of the cells adjacent to it - in one 
+of the four directions (up, down, left, or right), if it has 
+the same value of the current cell.
+
+Also, you cannot move to the cell that you visited in your 
+last move. For example, the cycle (1, 1) -> (1, 2) -> (1, 1) 
+is invalid because from (1, 2) we visited (1, 1) which was 
+the last visited cell.
+
+Return true if any cycle of the same value exists in grid, 
+otherwise, return false.
+
+
+class Solution {
+public:
+
+    bool dfs(int curr_row, int curr_col, int parent_row, 
+        int parent_col, vector<vector<int>>& visited, 
+        int m, int n, vector<vector<char>>& grid) {
+
+        int row_[] = {1, -1, 0, 0};
+        int col_[] = {0, 0, 1, -1};
+
+        if(visited[curr_row][curr_col]){
+            return true;
+        }
+        visited[curr_row][curr_col] = 1;
+        for(int k=0; k<4; k++) {
+            int new_row = row_[k] + curr_row;
+            int new_col = col_[k] + curr_col;
+            if(new_row == parent_row && new_col == parent_col) {
+                continue;
+            }
+            if(new_row >= 0 && new_col >= 0 && new_row < m && new_col < n 
+                && grid[new_row][new_col] == grid[curr_row][curr_col]) {
+
+                if(dfs(new_row, new_col, curr_row, curr_col, visited, m, n, grid)){
+
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+    bool containsCycle(vector<vector<char>>& grid) {
+        int m = grid.size();
+        int n = grid[0].size();
+        vector<vector<int>> visited(m, vector<int> (n, 0));
+
+        for(int i=0; i<m; i++) {
+            for(int j=0; j<n; j++) {
+                if(!visited[i][j] && dfs(i, j, -1, -1, visited, m, n, grid)){
+                    
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+};
