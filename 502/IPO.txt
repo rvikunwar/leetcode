@@ -1,0 +1,81 @@
+Suppose LeetCode will start its IPO soon. In order to sell a good price of 
+its shares to Venture Capital, LeetCode would like to work on some projects 
+to increase its capital before the IPO. Since it has limited resources, it can 
+only finish at most k distinct projects before the IPO. Help LeetCode design 
+the best way to maximize its total capital after finishing at most k distinct projects.
+
+You are given n projects where the ith project has a pure profit profits[i] 
+and a minimum capital of capital[i] is needed to start it.
+
+Initially, you have w capital. When you finish a project, you will obtain 
+its pure profit and the profit will be added to your total capital.
+
+Pick a list of at most k distinct projects from given projects to maximize 
+your final capital, and return the final maximized capital.
+
+The answer is guaranteed to fit in a 32-bit signed integer.
+
+
+class Solution {
+public:
+    int findMaximizedCapital(int k, int w, vector<int>& profits, vector<int>& capital) {
+        priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>> pq;
+        priority_queue<int> profit_heap;
+        int n = profits.size();
+
+        for(int i=0; i<n; i++) {
+            pq.push({ capital[i], profits[i] });
+        }
+
+        int l = 0;
+        while(l<k) {
+            while(!pq.empty() && pq.top().first <= w) {
+                profit_heap.push(pq.top().second);
+                pq.pop();
+            }
+            if(profit_heap.empty()) break;
+            w += profit_heap.top();
+            profit_heap.pop();
+            l++;
+        }
+
+        return w;
+    }
+};
+
+// class Solution {
+// public:
+//     vector<int> profits_; 
+//     vector<int> capital_;
+//     int K;
+//     int N;
+//     int f(int index, int k, int weight_left, vector<vector<vector<int>>> &dp) {
+//         if(k == K || index == N){
+//             return 0;
+//         }
+
+//         if(dp[index][k][weight_left] != -1){
+//             return dp[index][k][weight_left];
+//         }
+
+//         int current_weight = capital_[index];
+//         int ans = 0;
+//         if(current_weight <= weight_left) {
+//             ans = max(f(index+1, k, weight_left, dp), profits_[index] + f(index+1, k+1, weight_left + profits_[index], dp));
+//         } else {
+//             ans = f(index+1, k, weight_left, dp);
+//         }
+//         return dp[index][k][weight_left] = ans;
+//     }
+
+//     int findMaximizedCapital(int k, int w, vector<int>& profits, vector<int>& capital) {
+//         N = capital.size();
+//         capital_ = capital;
+//         profits_ =  profits;
+//         K = k;
+//         vector<vector<vector<int>>> dp(N, vector<vector<int>> (k+1, vector<int>(10009, -1)));
+        
+//         return w + f(0, 0, w, dp);
+
+//     }
+// };
