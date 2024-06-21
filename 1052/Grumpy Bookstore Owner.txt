@@ -1,0 +1,53 @@
+There is a bookstore owner that has a store open for n 
+minutes. Every minute, 
+some number of customers enter the store. You are given an 
+integer array customers of length n where customers[i] is 
+the number of the customer that enters the store at the 
+start of the ith minute and all those customers leave 
+after the end of that minute.
+
+On some minutes, the bookstore owner is grumpy. You are 
+given a binary array grumpy where grumpy[i] is 1 if the 
+bookstore owner is grumpy during the ith minute, and is 
+0 otherwise.
+
+When the bookstore owner is grumpy, the customers of that 
+minute are not satisfied, otherwise, they are satisfied.
+
+The bookstore owner knows a secret technique to keep 
+themselves not grumpy for minutes consecutive minutes, 
+but can only use it once.
+
+Return the maximum number of customers that can be 
+satisfied throughout the day.
+
+class Solution {
+public:
+    int maxSatisfied(vector<int>& customers, vector<int>& grumpy, int minutes) {
+        int n = customers.size();
+        vector<int> prefix_sum(n+1, 0);
+
+        int total_customer = 0;
+        for(int i=1; i<=n; i++) {
+            if(grumpy[i-1] == 1){
+                prefix_sum[i] = prefix_sum[i-1] + customers[i-1];
+            } else {
+                prefix_sum[i] = prefix_sum[i-1];
+            }
+            total_customer += customers[i-1];
+        }
+
+        int i=1;
+        int j=1;
+        int max_customer = 0;
+        while(j <= n) {
+            if(j-i+1 == minutes) {
+                int new_sum = prefix_sum[j] - prefix_sum[i-1];
+                max_customer = max(max_customer, new_sum);
+                i++;
+            } 
+            j++;
+        }
+        return total_customer - prefix_sum[n] + max_customer;
+    }
+};
