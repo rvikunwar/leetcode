@@ -1,0 +1,106 @@
+A magician has various spells.
+
+You are given an array power, where each element represents the damage 
+of a spell. Multiple spells can have the same damage value.
+
+It is a known fact that if a magician decides to cast a spell with a 
+damage of power[i], they cannot cast any spell with a damage of 
+power[i] - 2, power[i] - 1, power[i] + 1, or power[i] + 2.
+
+Each spell can be cast only once.
+
+Return the maximum possible total damage that a magician can cast.
+
+
+class Solution {
+public:
+    long long maximumTotalDamage(vector<int>& power) {
+        unordered_map<int, long long> damage_frequency;
+        for(int damage: power) {
+            damage_frequency[damage]++;
+        }
+
+        vector<int> unique_damages;
+        for(auto pair: damage_frequency) {
+            unique_damages.push_back(pair.first);
+        }
+
+        sort(unique_damages.begin(), unique_damages.end());
+
+        int unique_damages_size = unique_damages.size();
+        vector<long long> dp(unique_damages_size, 0);
+        dp[0] = unique_damages[0] * damage_frequency[unique_damages[0]];
+
+        long long maximum_damage = 0;
+        for(int i=1; i<unique_damages_size; i++) {
+            int j = i-1;
+            long long current_damage_value = unique_damages[i] * damage_frequency[unique_damages[i]];
+            while(j>=0) {
+                if(unique_damages[j] + 1 == unique_damages[i] || unique_damages[j] + 2 == unique_damages[i]) {
+                    dp[i] = max(dp[i], dp[j]);
+                    j--;
+                } else {
+                    break;
+                }
+            }
+
+            if(j <  0) {
+                dp[i] = max(dp[i], current_damage_value);
+            } else {
+                long long prev_damage_value = dp[j];
+                dp[i] = max(dp[i], current_damage_value + prev_damage_value);
+            }
+        }
+
+        return dp[unique_damages_size-1];
+    }
+};
+
+// class Solution {
+// public:
+//     unordered_map<int, long long> damage_frequency;
+//     vector<long long> dp;
+//     vector<int> next_index;
+
+//     long long helper(int index, vector<int>& unique_damages) {
+//         if(index >= unique_damages.size()) {
+//             return 0;
+//         }
+
+//         if(dp[index] != -1) {
+//             return dp[index];
+//         }
+//         int current_damage = unique_damages[index];
+//         long long max_damage = 0;
+
+//         if(next_index[index] < unique_damages.size()) {
+//             max_damage = max(current_damage * damage_frequency[current_damage] + helper(next_index[index], unique_damages), helper(index+1, unique_damages));
+//         } else {
+//             max_damage = max(current_damage * damage_frequency[current_damage], helper(index + damage_frequency[current_damage], unique_damages));
+//         }
+        
+//         return dp[index] = max_damage;
+//     }
+
+//     long long maximumTotalDamage(vector<int>& power) {
+       
+//         for(int damage: power) {
+//             damage_frequency[damage]++;
+//         }
+//         // for(auto pair: damage_frequency) {
+//         //     unique_damages.push_back(pair.first);
+//         // }
+
+
+//         sort(power.begin(), power.end());
+
+//         dp.resize(power.size(), -1);
+
+//         next_index.resize(power.size());
+//         for(int i=0; i<power.size(); i++) {
+//             next_index[i] = upper_bound(power.begin() + i, power.end(), power[i] + 2) - power.begin();
+//         }
+//         return helper(0, power);
+        
+//     }
+// };
