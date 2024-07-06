@@ -1,0 +1,89 @@
+There are n points on a road you are driving your taxi on. 
+The n points on the road are labeled from 1 to n in the direction 
+you are going, and you want to drive from point 1 to point n to 
+make money by picking up passengers. 
+You cannot change the direction of the taxi.
+
+The passengers are represented by a 0-indexed 2D integer 
+array rides, where rides[i] = [starti, endi, tipi] 
+denotes the ith passenger requesting a ride from point 
+starti to point endi who is willing to give a tipi dollar tip.
+
+For each passenger i you pick up, you earn endi - starti + tipi dollars. 
+You may only drive at most one passenger at a time.
+
+Given n and rides, return the maximum number of dollars you can 
+earn by picking up the passengers optimally.
+
+Note: You may drop off a passenger and pick up a different passenger 
+at the same point.
+
+class Solution {
+public:
+    vector<vector<int>> rides_;
+    vector<int> next_ride_index;
+    vector<long long> dp;
+
+    int lower_bound_2D(int target) {
+        int lower = 0;
+        int upper = rides_.size()-1;
+        int ans = rides_.size();
+        while(lower <= upper) {
+            int mid = lower + (upper - lower)/2;
+
+            if(rides_[mid][0] >= target) {
+                ans = mid;
+                upper = mid - 1;
+            } else {
+                lower = mid + 1;
+            }
+        }
+
+        return ans;
+    }
+
+    long long helper(int current_index) {
+        if(current_index == rides_.size()){
+            return 0;
+        }
+
+        if(dp[current_index] != -1) {
+            return dp[current_index];
+        }
+
+        vector<int> current_ride = rides_[current_index];
+        int tip = current_ride[1] - current_ride[0] + current_ride[2];
+        long long ans = max(tip + helper(next_ride_index[current_index]), helper(current_index+1));
+
+        return dp[current_index] = ans;
+    }
+
+    // long long maxTaxiEarnings(int n, vector<vector<int>>& rides) {
+    //     rides_ = rides;
+    //     sort(rides_.begin(), rides_.end());
+    //     dp.resize(rides_.size(), -1);
+    //     for(int i=0; i<rides_.size(); i++) {
+    //         next_ride_index.push_back(lower_bound_2D(rides_[i][1]));
+    //         // cout<<next_ride_index[i]<<endl;
+    //     }
+    //     return helper(0);
+    // }
+
+
+    long long maxTaxiEarnings(int n, vector<vector<int>>& rides) {
+        rides_ = rides;
+        dp.resize(rides_.size()+1);
+
+        vector<int> start_time;
+        sort(rides_.begin(), rides_.end());
+        for(int i=0;i<rides_.size();i++) start_time.push_back(rides_[i][0]);
+
+        for(int i=rides_.size()-1; i>=0; i--) {
+            int ind = lower_bound(start_time.begin(), start_time.end(), rides_[i][1]) - start_time.begin();
+            long long tip = rides_[i][1] - rides_[i][0] + rides_[i][2];
+            dp[i] = max(dp[ind] + tip, dp[i+1]);
+        }
+        return dp[0];
+    }
+};
+
