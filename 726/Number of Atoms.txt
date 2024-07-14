@@ -1,0 +1,114 @@
+Given a string formula representing a chemical formula, return the count of each atom.
+
+The atomic element always starts with an uppercase character, then zero or more lowercase 
+letters, representing the name.
+
+One or more digits representing that element's count may follow if the count is greater than 1. 
+If the count is 1, no digits will follow.
+
+For example, "H2O" and "H2O2" are possible, but "H1O2" is impossible.
+Two formulas are concatenated together to produce another formula.
+
+For example, "H2O2He3Mg4" is also a formula.
+A formula placed in parentheses, and a count (optionally added) is also a formula.
+
+For example, "(H2O2)" and "(H2O2)3" are formulas.
+Return the count of all elements as a string in the following form: the first 
+name (in sorted order), followed by its count (if that count is more than 1), 
+followed by the second name (in sorted order), followed by its count (if that count is more than 1), and so on.
+
+The test cases are generated so that all the values in the output fit in a 32-bit integer.
+
+class Solution {
+public:
+    
+    unordered_map<string, int> helper(int &index, string &formula) {
+        unordered_map<string, int> mp;
+        int size = formula.size();
+
+        string ch = "";
+        string last_ch = "";
+        int last_val = 0;
+        while(index < size) {
+            if(formula[index] == '(') {
+                if(ch != "") {
+                    mp[ch] += 1;
+                    ch = "";
+                }
+                index++;
+                auto nested_mp = helper(index, formula);
+                index++;
+
+                int mul = 1;
+                if(index < size && isdigit(formula[index])) { 
+                    int value = (formula[index] - '0');
+                    index++;
+                    while(index < size && isdigit(formula[index])) {
+                        value = value*10 + (formula[index] - '0');
+                        index++;
+                    }
+                    mul = value;
+                }
+
+                for(auto it: nested_mp) {
+                    mp[it.first] += (it.second * mul);
+                }
+                continue;
+            }
+
+            if(formula[index] == ')') {
+                if(ch != ""){
+                    mp[ch] += 1;
+                }
+                return mp;
+            }
+
+            if(isalpha(formula[index])) {
+                if(ch == "" || islower(formula[index])) {
+                    ch += formula[index];
+                } else {
+                    mp[ch] += 1;
+                    ch = formula[index];
+                }
+            } else {
+                int value = (formula[index] - '0');
+
+                while(index+1 < size && isdigit(formula[index+1])) {
+                    value = value*10 + (formula[index+1] - '0');
+                    index++;
+                } 
+                mp[ch] += value;
+                ch = "";
+            }
+            index++;
+        }
+
+        if(ch != "") {
+            mp[ch] += 1;
+        }
+
+        return  mp;
+    } 
+
+    string countOfAtoms(string formula) {
+        int index = 0;
+        auto nested_mp = helper(index, formula);
+        map<string, int> mp;
+
+        for(auto it: nested_mp) {
+            mp[it.first] += it.second;
+        }
+
+        string ans = "";
+        for(auto it: mp) {
+            if(it.second > 1) {
+                ans += it.first;
+                ans += to_string(it.second);
+            } else {
+                ans += it.first;
+            }
+        }
+        return ans;
+    }
+};
+
