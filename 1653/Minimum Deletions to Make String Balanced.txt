@@ -1,0 +1,35 @@
+Minimum Deletions to Make String Balanced.txt
+
+class Solution {
+public:
+    int minimumDeletions(string s) {
+        int ans = INT_MAX;
+        int n = s.size();
+
+        vector<int> preB(n+2, 0);
+        vector<int> suffA(n+2, 0);
+
+        for(int i=0; i<n; i++) {
+            if(s[i] == 'b') {
+                preB[i+1] = 1 + preB[i];  
+            } else {
+                preB[i+1] = preB[i];
+            }
+        }
+
+        for(int i=n-1; i>=0; i--) {
+            if(s[i] == 'a') {
+                suffA[i+1] = 1 + suffA[i+2];  
+            } else {
+                suffA[i+1] = suffA[i+2];
+            }
+        }
+
+        for(int i=1; i<=n; i++) {
+            ans = min(ans, preB[i] + suffA[i] - 1);
+        }
+        
+        return ans;
+    }
+};
+// ;the hindu 
