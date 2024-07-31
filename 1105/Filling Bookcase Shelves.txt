@@ -1,0 +1,38 @@
+Filling Bookcase Shelves.txt
+
+class Solution {
+public:
+
+    vector<vector<int>> books_;
+    int shelf_width_;
+    vector<vector<int>> dp;
+
+    int f(int index, int left_width, int current_max_height) {
+        if(books_.size() == index) {
+            return current_max_height;
+        }
+
+        if(dp[index][left_width] != -1) {
+            return dp[index][left_width];
+        }
+
+        vector<int> current_book = books_[index];
+        int ans;
+        if(current_book[0] <= left_width) {
+            ans = min(f(index + 1, left_width - current_book[0], max(current_max_height, current_book[1])), 
+                current_max_height + f(index+1, shelf_width_ - current_book[0], current_book[1]));
+        } else {
+            ans  = current_max_height + f(index+1, shelf_width_ - current_book[0], current_book[1]);
+        }
+
+        return dp[index][left_width] = ans;
+    }
+
+    int minHeightShelves(vector<vector<int>>& books, int shelfWidth) {
+        books_ = books;
+        shelf_width_ = shelfWidth;
+        dp.resize(1001, vector<int> (1001, -1));
+        return f(0, shelfWidth, 0);
+    }
+};
+
